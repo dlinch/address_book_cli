@@ -43,8 +43,8 @@ class Search
   end
 
   def name_or_address_present?
-    unless name || address
-      fail_validation(MISSING_BOTH)
+    if !name || !address
+      fail_validation(MISSING_BOTH) and return
     end
 
     unless !!name ^ !!address

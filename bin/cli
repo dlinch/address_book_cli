@@ -22,7 +22,10 @@ OptionParser.new do |opts|
 end.parse!(into: options)
 
 search = Search.new(options)
-puts "Invalid search!", search.error if search.invalid?
+if search.invalid?
+  puts "Invalid search!", search.error
+  exit
+end
 
 results = Book.lookup(search)
 
