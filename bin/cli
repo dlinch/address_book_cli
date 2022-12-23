@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'fileutils'
+require 'optparse'
+require_relative '../lib/search'
+require_relative '../lib/book'
+
+options = {
+  name: nil,
+  address: nil,
+  regexp: false,
+}
+
+set_option = Proc.new { |option_name| -> (option_value) { options[option_name] = option_value} } 
+
+OptionParser.new do |opts|
+  opts.on('-n [NAME]', '--name [NAME]', 'Name to search against the address book', &set_option.call(:name))
+  opts.on('-a [ADDRESS]', '--address [ADDRESS]', 'Address to pull up from the address book', &set_option.call(:address))
+  opts.on('-r', '--regexp', TrueClass, 'Use regex for the lookup value', &set_option.call(:regexp))
+
+  opts.on("-h", "--help", "Prints available options") do
+    puts opts
+    exit
+  end
+end.parse!
+
+search = Search.new(options)
+puts "Invalid search!", search.error if search.invalid?
+
+results = Book.lookup(search)
+
+puts <<-HEREDOC
+  Here are the results we found!
+
+HEREDOC
+results
