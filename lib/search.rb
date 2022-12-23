@@ -54,7 +54,7 @@ class Search
 
   def set_term_and_type
     @term = name || address
-    @type = name? ? :name : :addres
+    @type = name? ? :name : :address
   end
 
   def fail_validation(message)

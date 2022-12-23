@@ -6,11 +6,7 @@ require 'optparse'
 require_relative '../lib/search'
 require_relative '../lib/book'
 
-options = {
-  name: nil,
-  address: nil,
-  regexp: false,
-}
+options = {}
 
 set_option = Proc.new { |option_name| -> (option_value) { options[option_name] = option_value} } 
 
@@ -23,15 +19,19 @@ OptionParser.new do |opts|
     puts opts
     exit
   end
-end.parse!
+end.parse!(into: options)
 
 search = Search.new(options)
 puts "Invalid search!", search.error if search.invalid?
 
 results = Book.lookup(search)
 
-puts <<-HEREDOC
+success_message = <<-HEREDOC
   Here are the results we found!
 
+  #{results}
 HEREDOC
-results
+
+failure_message = "No results found!"
+puts results.length != 0 ? success_message : failure_message
+

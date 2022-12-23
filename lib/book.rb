@@ -23,25 +23,31 @@ class Book
   end
 
   def address_lookup(*args)
-    @entries.select(&match_proc(*args))
+    @entries.select(&address_proc(*args))
   end
 
   def format_results(results)
     results.map do |key, value|
       <<-HEREDOC
         Name: #{key}
-        Address: #{valu}
+        Address: #{value}
       HEREDOC
     end.join("\n")
   end
 
   def name_lookup(*args)
-    @entries.invert.select(&match_proc(*args)).invert
+    @entries.select(&name_proc(*args))
   end
 
-  def match_proc(term, fuzzy)
-    fuzzy_match = -> (key, value) { Regexp.new(term, Regexp::IGNORECASE).match?(value) }
-    exact_match = -> (key, value) { value == term }
+  def address_proc(term, fuzzy)
+    fuzzy_match = -> (_, value) { Regexp.new(term, Regexp::IGNORECASE).match?(value) }
+    exact_match = -> (_, value) { value == term }
+    fuzzy ? fuzzy_match : exact_match
+  end
+
+  def name_proc(term, fuzzy)
+    fuzzy_match = -> (key, _) { Regexp.new(term, Regexp::IGNORECASE).match?(key) }
+    exact_match = -> (key, _) { key == term }
     fuzzy ? fuzzy_match : exact_match
   end
 end
